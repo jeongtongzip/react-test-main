@@ -1,0 +1,142 @@
+/* font폴더 안에 abster폰트 적용 */
+@font-face {
+  font-family: abster;
+  src: url('../font/abster-webfont.woff') format("woff");
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: #363636;
+  margin: 0;
+  overflow: hidden;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.main .container {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+    url("../images/airplane.jpg") no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.main .container .header {
+  width: 80%;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main .container .header h1 a {
+  text-decoration: none;
+  color: white;
+  font-family: abster;
+}
+
+.main .container .nav ul li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+/* 효진, 홍민, 선애, 유빈 버튼 스타일 수정 */
+.main .container .nav ul li:nth-child(1) button,
+.main .container .nav ul li:nth-child(2) button,
+.main .container .nav ul li:nth-child(3) button,
+.main .container .nav ul li:nth-child(4) button {
+  
+  background-color: transparent;
+  border: none;
+  color: white;
+  padding: 0px 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+/* 효진, 홍민, 선애, 유빈 버튼 호버 스타일 수정 */
+.main .container .nav ul li:nth-child(1) button:hover,
+.main .container .nav ul li:nth-child(2) button:hover,
+.main .container .nav ul li:nth-child(3) button:hover,
+.main .container .nav ul li:nth-child(4) button:hover {
+  background-color: transparent;
+  color: rgba(192, 88, 23, 0.8); /* Darker Green */
+}
+
+.main .container .hero {
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.main .container .hero h2 {
+  font-size: 50px;
+  margin-bottom: 20px; /* 이전에는 230px이었습니다. */
+}
+
+.main .container .hero p {
+  margin-top: 20px; /* 새로운 p 태그의 위치를 조정합니다. */
+}
+
+.main .container .hero .btn {
+  margin-top: 100px;
+  /* 버튼 스타일을 추가합니다. */
+  background: none;
+  border: 2px solid rgba(192, 88, 23, 0.8);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 20px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+
+.main .container .hero .btn:hover {
+  background-color: rgb(113, 64, 35);
+}
+
+.main .container .hero .typing-text {
+  font-family: "Fuzzy Bubbles", sans-serif;
+  color: white;
+  font-size: 1.5rem;
+  border-right: 3px solid white; /* 커서 만들기 */
+  animation: blink 0.5s infinite, typing 2s steps(22);
+  white-space: nowrap;
+  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: -130px;
+}
+
+.main .person-description {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
+}
