@@ -40,23 +40,7 @@ function Main() {
               </button>
               <button className="btn">검색으로 확인하기</button>
             </div>
-            {showDescription && (
-              <div className="person-description">
-                <h3>{currentPerson}</h3>
-                {currentPerson === "선애" && (
-                  <p>AI기능 개발을 담당하고 있어.</p>
-                )}
-                {currentPerson === "효진" && (
-                  <p>BackEnd 개발을 담당하고 있어.</p>
-                )}
-                {currentPerson === "홍민" && (
-                  <p>FrontEnd 개발을 담당하고 있어.</p>
-                )}
-                {currentPerson === "유빈" && (
-                  <p>FrontEnd 개발을 담당하고 있어.</p>
-                )}
-              </div>
-            )}
+            
           </div>
         )}
         <Routes>
