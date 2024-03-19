@@ -1,22 +1,96 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
-import { Camera } from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
+import React, { useState, useEffect, useRef } from "react";
+import "./Domestic.css";
 
-export default function Domestic() {
+function Domestic() {
   const [currentPerson, setCurrentPerson] = useState("");
   const [showDescription, setShowDescription] = useState(false);
-  const [cameraPermission, setCameraPermission] = useState(null);
-  const [domesticClicked, setDomesticClicked] = useState(true);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const cameraRef = useRef(null);
+  const videoRef = useRef(null); // useRef 훅을 사용하여 video 요소에 대한 참조 생성
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setCameraPermission(status === 'granted');
-    })();
-  }, []);
+    accessWebcam(); // 컴포넌트가 마운트될 때 웹캠에 접근
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => {
+          track.stop();
+        });
+      }
+    };
+  }, []); // 한 번만 실행되어야 함
+
+  const handleCapture = () => {
+    const videoElement = videoRef.current;
+
+    if (videoElement) {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      const videoWidth = videoElement.videoWidth;
+      const videoHeight = videoElement.videoHeight;
+
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+
+      // 비디오 프레임을 캔버스에 그립니다.
+      context.drawImage(videoElement, 0, 0, videoWidth, videoHeight);
+
+      // 캔버스를 이미지로 변환합니다.
+      const image = canvas.toDataURL("image/png");
+
+      // 이미지를 내 노트북에 저장하거나 다른 작업을 수행합니다.
+      saveImageToFile(image);
+    }
+  };
+
+  const saveImageToFile = (imageData) => {
+    // 이미지 데이터를 Blob 형태로 변환합니다.
+    const byteString = atob(imageData.split(",")[1]);
+    const mimeString = imageData.split(",")[0].split(":")[1].split(";")[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeString });
+
+    // 파일 다운로드 링크를 생성합니다.
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(blob);
+
+    // 파일 이름을 지정합니다. 예시에서는 "captured_image.png"로 설정합니다.
+    downloadLink.download = "captured_image.png";
+
+    // 파일 다운로드를 실행합니다.
+    downloadLink.click();
+  };
+
+  const accessWebcam = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        if (videoRef.current) {
+          const videoElement = videoRef.current;
+          videoElement.srcObject = stream;
+          videoElement.play();
+          setTimeout(centerWebcam, 100);
+        }
+      })
+      .catch((error) => {
+        console.error("웹캠에 접근 실패:", error);
+      });
+  };
+
+  const centerWebcam = () => {
+    if (videoRef.current) {
+      const videoElement = videoRef.current;
+      const containerWidth = document.getElementById("webcam-container")
+        .offsetWidth;
+      const videoWidth = videoElement.videoWidth;
+      const marginLeft = (containerWidth - videoWidth) / 2;
+      videoElement.style.left = `${marginLeft}px`;
+      videoElement.style.marginTop = "-150px";
+    }
+  };
 
   const handlePersonClick = (person) => {
     setCurrentPerson(person);
@@ -24,126 +98,55 @@ export default function Domestic() {
     setTimeout(() => setShowDescription(false), 5000);
   };
 
-  const handleCapture = async () => {
-    if (!cameraRef.current) return;
-
-    try {
-      const { uri } = await cameraRef.current.takePictureAsync();
-      setCapturedImage(uri);
-      saveImageToGallery(uri);
-    } catch (error) {
-      console.error('Error taking picture:', error);
-    }
-  };
-
-  const saveImageToGallery = async (uri) => {
-    if (Platform.OS === 'android') {
-      const asset = await MediaLibrary.createAssetAsync(uri);
-      await MediaLibrary.createAlbumAsync('Visioners', asset, false);
-    } else {
-      MediaLibrary.saveToLibraryAsync(uri);
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>
-          <Text style={styles.link}>VISIONERS</Text>
-        </Text>
-        <View style={styles.nav}>
-          <TouchableOpacity onPress={() => handlePersonClick("선애")}><Text>선애</Text></TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePersonClick("효진")}><Text>효진</Text></TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePersonClick("홍민")}><Text>홍민</Text></TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePersonClick("유빈")}><Text>유빈</Text></TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.webcamContainer}>
-        <Camera
-          style={styles.camera}
-          type={Camera.Constants.Type.back}
-          ref={cameraRef}
-        />
-        <View style={styles.hero}>
-          <Text>규칙</Text>
-          <Text>새로운 규칙2</Text>
-          <Text>새로운 규칙3</Text>
-          <Text>새로운 규칙4</Text>
-        </View>
-        <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
-          <Text style={styles.captureButtonText}>촬영하기</Text>
-        </TouchableOpacity>
-      </View>
-      {showDescription && (
-        <View style={styles.personDescription}>
-          <Text>{currentPerson}</Text>
-          {currentPerson === "선애" && <Text>AI기능 개발을 담당하고 있어.</Text>}
-          {currentPerson === "효진" && <Text>BackEnd 개발을 담당하고 있어.</Text>}
-          {currentPerson === "홍민" && <Text>FrontEnd 개발을 담당하고 있어.</Text>}
-          {currentPerson === "유빈" && <Text>FrontEnd 개발을 담당하고 있어.</Text>}
-        </View>
-      )}
-    </View>
+    <div className="domestic">
+      <div className="container">
+        <div className="header">
+          <h1>
+            <a href="/">VISIONERS</a>
+          </h1>
+          <div className="nav">
+          <ul>
+                <li><button onClick={() => handlePersonClick("선애")}>선애</button></li>
+                <li><button onClick={() => handlePersonClick("효진")}>효진</button></li>
+                <li><button onClick={() => handlePersonClick("홍민")}>홍민</button></li>
+                <li><button onClick={() => handlePersonClick("유빈")}>유빈</button></li>
+              </ul>
+          </div>
+        </div> 
+        <div id="webcam-container" className="webcam-container">
+          <video ref={videoRef} className="webcam-video" />
+          <div className="hero">
+            <p>규칙<br /> <br />
+               새로운 규칙2<br /> <br />
+               새로운 규칙3<br /> <br />
+               새로운 규칙4<br /> <br />
+            </p>
+          </div>
+          <button className="btn capture-button" onClick={handleCapture}>
+              촬영하기
+          </button>
+        </div>
+        {showDescription && (
+          <div className="person-description">
+            <h3>{currentPerson}</h3>
+            {currentPerson === "선애" && (
+              <p>AI기능 개발을 담당하고 있어.</p>
+            )}
+            {currentPerson === "효진" && (
+              <p>BackEnd 개발을 담당하고 있어.</p>
+            )}
+            {currentPerson === "홍민" && (
+              <p>FrontEnd 개발을 담당하고 있어.</p>
+            )}
+            {currentPerson === "유빈" && (
+              <p>FrontEnd 개발을 담당하고 있어.</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#363636',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  headerText: {
-    color: 'white',
-    fontSize: 20,
-    fontFamily: 'abster',
-  },
-  link: {
-    textDecorationLine: 'underline',
-  },
-  nav: {
-    flexDirection: 'row',
-    marginLeft: 'auto',
-    marginRight: 20,
-  },
-  webcamContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    position: 'relative',
-  },
-  camera: {
-    width: '100%',
-    height: '100%',
-  },
-  hero: {
-    position: 'absolute',
-    bottom: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  captureButton: {
-    position: 'absolute',
-    bottom: 60,
-    backgroundColor: 'rgba(192, 88, 23, 0.8)',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  captureButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  personDescription: {
-    position: 'absolute',
-    bottom: 20,
-    alignItems: 'center',
-  },
-});
+export default Domestic;
