@@ -29,12 +29,7 @@ function Main() {
                 <a href="/">VISIONERS</a>
               </h1>
               <div className="nav">
-                <ul>
-                  <li><button onClick={() => handlePersonClick("선애")}>선애</button></li>
-                  <li><button onClick={() => handlePersonClick("효진")}>효진</button></li>
-                  <li><button onClick={() => handlePersonClick("홍민")}>홍민</button></li>
-                  <li><button onClick={() => handlePersonClick("유빈")}>유빈</button></li>
-                </ul>
+                
               </div>
             </div>
             <div className="hero">
