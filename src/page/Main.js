@@ -1,20 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 
-import CameraMain from "./CameraMain";
+//import CameraMain from "./CameraMain";
 import "./Main.css";
 
 function Main() {
-  const [currentPerson, setCurrentPerson] = useState("");
-  const [showDescription, setShowDescription] = useState(false);
+  
   const [cameraMainClicked, setCameraMainClicked] = useState(false);
 
-  const handlePersonClick = (person) => {
-    setCurrentPerson(person);
-    setShowDescription(true);
-    setTimeout(() => setShowDescription(false), 5000); // 5초 후에 설명 숨김
-  };
-
+  
   const handleCameraMainClick = () => {
     setCameraMainClicked(true);
   };
@@ -43,11 +37,12 @@ function Main() {
             
           </div>
         )}
-        <Routes>
-          <Route path="/camera-main" element={<CameraMain />} />
+       <Routes>
+          
         </Routes>
       </div>
     </Router>
+    
   );
 }
 
